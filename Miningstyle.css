@@ -35,7 +35,7 @@ body {
     background: var(--bg-main);
     min-height: 100vh;
     color: var(--text-main);
-    padding: 20px;
+    padding: 20px 15px;
 }
 
 .navbar {
