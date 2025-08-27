@@ -34,6 +34,7 @@ body {
     font-family: "Arial", sans-serif;
     background: var(--bg-main);
     min-height: 100vh;
+    width: 200px;
     color: var(--text-main);
     padding: 20px;
 }
