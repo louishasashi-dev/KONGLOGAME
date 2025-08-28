@@ -257,7 +257,7 @@ body {
     border-radius: 5px;
     border: none;
     background: var(--btn-primary);
-    color: var(--text-main);
+    color: black;
 }
 
 .converter-btn {
