@@ -513,17 +513,44 @@ function initAssetGrids() {
                 imageHtml = `<img src="${asset.image}" alt="${asset.name}" class="asset-image" onerror="this.style.display='none'">`;
             }
 
-            assetEl.innerHTML = `
-                        ${imageHtml}
-                        <div class="asset-name">${asset.name}</div>
-                        <div class="asset-price">$${asset.price.toLocaleString()}</div>
-                        <div class="asset-income">${getAssetIncomeText(
-                            category,
-                            asset
-                        )}</div>
-                        <div class="asset-owned">Owned: <span id="${category}_${index}_owned">0</span></div>
-                        <button class="buy-btn" onclick="buyAsset('${category}', ${index})">Buy Asset</button>
-                    `;
+            // markup dasar (semua kategori)
+            let baseHtml = `
+                ${imageHtml}
+                <div class="asset-name">${asset.name}</div>
+                <div class="asset-price">$${asset.price.toLocaleString()}</div>
+                <div class="asset-income">${getAssetIncomeText(category, asset)}</div>
+                <div class="asset-owned">Owned: <span id="${category}_${index}_owned">0</span></div>
+                <button class="buy-btn" onclick="buyAsset('${category}', ${index})">Buy Asset</button>
+            `;
+
+            // 🔹 Khusus STOCKS: tambahkan kontrol "Buy Qty" & "All In"
+            if (category === "stocks") {
+                baseHtml += `
+                    <div class="buy-controls" style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+                        <input 
+                            type="number" 
+                            id="stocks_${index}_qty" 
+                            value="1" 
+                            min="1" 
+                            style="width:90px;padding:6px;border-radius:6px;border:none;"
+                        >
+                        <button 
+                            id="stocks_${index}_buyqty" 
+                            class="buy-btn" 
+                            onclick="buyAsset('stocks', ${index}, Math.max(1, parseInt(document.getElementById('stocks_${index}_qty').value)||1))">
+                            Buy Qty
+                        </button>
+                        <button 
+                            id="stocks_${index}_allin" 
+                            class="buy-btn" 
+                            onclick="buyAllIn('stocks', ${index})">
+                            All In
+                        </button>
+                    </div>
+                `;
+            }
+
+            assetEl.innerHTML = baseHtml;
             grid.appendChild(assetEl);
         });
     });
@@ -570,9 +597,28 @@ function buyAsset(category, index) {
 }
 
 function updateAssetDisplay(category, index) {
+    // Update teks "Owned"
     const ownedEl = document.getElementById(`${category}_${index}_owned`);
-    const owned = gameState.assets[category][index] || 0;
-    ownedEl.textContent = owned;
+    if (ownedEl) {
+        const owned = gameState.assets[category][index] || 0;
+        ownedEl.textContent = owned;
+    }
+
+    // 🔹 Khusus STOCKS: kelola tombol Buy Qty & All In
+    if (category === "stocks") {
+        const asset = assetData[category][index];
+        const canAffordOne = gameState.money >= asset.price;
+
+        const qtyInput = document.getElementById(`stocks_${index}_qty`);
+        const buyQtyBtn = document.getElementById(`stocks_${index}_buyqty`);
+        const allInBtn  = document.getElementById(`stocks_${index}_allin`);
+
+        if (qtyInput && (parseInt(qtyInput.value) || 0) < 1) {
+            qtyInput.value = 1;
+        }
+        if (buyQtyBtn) buyQtyBtn.disabled = !canAffordOne;
+        if (allInBtn)  allInBtn.disabled  = !canAffordOne;
+    }
 }
 
 function calculatePassiveIncome() {
