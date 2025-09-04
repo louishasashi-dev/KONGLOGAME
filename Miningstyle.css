@@ -190,8 +190,7 @@ body {
     font-family: Monospace;
     margin-top: 15px;
     text-align: center;
-    font-size: clamp(1.2em, 4vw, 3em); /* 1.2em min, 3em max */
-    word-break: break-word;
+    font-size: 1.5rem;
 }
 
 .code-ex {
@@ -210,7 +209,7 @@ body {
 }
 
 .wallet-value-saving {
-    font-size: 1rem;
+    font-size: 0.5rem;
     color: white;
     font-weight: bolder;
 }
