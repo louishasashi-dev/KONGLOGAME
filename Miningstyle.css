@@ -75,12 +75,12 @@ body {
 .stats-panel {
     position: fixed;
     top: 0;
-    left: -300px; /* sembunyi default */
-    width: 300px;
+    left: -1200px; /* sembunyi default */
+    width: 1200px;
     height: 100%;
     background: var(--bg-panel);
     color: var(--text-main);
-    padding: 20px;
+    padding: 40px;
     transition: left 0.3s ease;
     z-index: 1100;
 }
