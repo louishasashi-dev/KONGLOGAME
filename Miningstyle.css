@@ -75,8 +75,8 @@ body {
 .stats-panel {
     position: fixed;
     top: 0;
-    left: -500px; /* sembunyi default */
-    width: 500px;
+    left: -400px; /* sembunyi default */
+    width: 400px;
     height: 100%;
     background: var(--bg-panel);
     color: var(--text-main);
