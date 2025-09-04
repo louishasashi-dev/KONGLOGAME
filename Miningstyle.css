@@ -108,6 +108,80 @@ body {
     gap: 20px;
 }
 
+.reset-btn {
+    background: var(--btn-secondary);
+    padding: 10px;
+    border-radius: 5px;
+    border-style: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text-main);
+    transition-duration: 0.3s;
+}
+.reset-btn:hover {
+    background: var(--btn-hover);
+    padding: 12px;
+    border-radius: 6px;
+    color: var(--text-muted);
+}
+
+/* Modal overlay */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; /* default hidden */
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    width: min(92vw, 420px);
+    background: var(--bg-panel);
+    color: var(--text-main);
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+    color: var(--text-heading);
+    margin-bottom: 8px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.btn-cancel,
+.btn-danger {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-cancel {
+    background: var(--btn-secondary);
+    color: #fff;
+}
+.btn-danger {
+    background: var(--color-error);
+    color: #fff;
+}
+.btn-cancel:hover,
+.btn-danger:hover {
+    opacity: 0.9;
+}
+
 .game-container {
     max-width: 1200px;
     margin: 0 auto;
