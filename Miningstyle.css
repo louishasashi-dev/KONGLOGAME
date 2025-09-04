@@ -189,7 +189,7 @@ body {
     color: white;
     font-family: Monospace;
     margin-top: 15px;
-    text-align: center;
+    text-align: left;
     font-size: 1.5rem;
 }
 
@@ -209,9 +209,9 @@ body {
 }
 
 .wallet-value-saving {
-    font-size: 0.5rem;
+    font-size: 1rem;
     color: white;
-    font-weight: bolder;
+    font-weight: bold;
 }
 
 .mining-display {
@@ -408,7 +408,7 @@ body {
 }
 
 .tab-btn.active {
-    background: var(--btn-hover);
+    background: white;
     color: #000;
 }
 
