@@ -12,10 +12,15 @@
         />
     </head>
     <body>
-        <div class="navbar">
-            <div class="logo">KONGLOGAME.COM</div>
-            <button class="stats-btn" onclick="toggleStats()">MENU</button>
-        </div>
+                <div class="navbar">
+            <span>KONGLOGAME.COM</span>
+            <div class="nav-actions">
+                <button class="stats-btn" onclick="toggleStats()">MENU</button>
+                <button class="reset-btn" onclick="openResetModal()">
+                    RESET
+                </button>
+            </div>
+                </div>
 
         <div id="statsPanel" class="stats-panel">
             <h2>📊 Game Statistics</h2>
@@ -244,6 +249,23 @@
                         </div>
                         <div class="asset-grid" id="businessGrid"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div id="resetModal" class="modal" aria-hidden="true">
+            <div class="modal-content">
+                <h3>Reset semua progres?</h3>
+                <p>
+                    Ini bakal hapus <b>ALL</b> income, assets, stats, level, dan
+                    dompet. Aksi ini nggak bisa dibalikin.
+                </p>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeResetModal()">
+                        Batal
+                    </button>
+                    <button class="btn-danger" onclick="confirmReset()">
+                        Ya, reset
+                    </button>
                 </div>
             </div>
         </div>
