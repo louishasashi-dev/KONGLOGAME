@@ -888,6 +888,32 @@ function loadGame() {
     }
 }
 
+function openResetModal() {
+  const m = document.getElementById("resetModal");
+  if (m) m.classList.add("show");
+}
+
+function closeResetModal() {
+  const m = document.getElementById("resetModal");
+  if (m) m.classList.remove("show");
+}
+
+function confirmReset() {
+  try {
+    // Hapus save
+    localStorage.removeItem("investmentEmpireSave");
+
+    // (Opsional) getaran mini di device yang support
+    if (navigator.vibrate) navigator.vibrate(60);
+
+    // Muat ulang biar semua state balik ke default (lihat default gameState di file ini)
+    window.location.reload();
+  } catch (e) {
+    alert("Gagal reset: " + e.message);
+    closeResetModal();
+  }
+}
+
 // Initialize game
 loadGame();
 initAssetGrids();
