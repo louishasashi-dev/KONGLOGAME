@@ -225,8 +225,8 @@ body {
 
 .wallet {
     background: rgba(255, 255, 255, 0.2);
-    padding: 24px;
-    margin-top: 15px;
+    padding: 15px;
+    margin-top: 10px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -514,5 +514,9 @@ body {
 @media (min-width: 1024px) {
     .game-container {
         grid-template-columns: 1fr 2fr;
+    }
+    .stats-panel {
+        display: flex;
+        flex-wrap: wrap;
     }
 }
