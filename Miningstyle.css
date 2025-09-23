@@ -47,7 +47,7 @@ body {
     height: 60px;
     background: var(--bg-navbar);
     color: white;
-    padding: 10px 30px;
+    padding: 23px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
