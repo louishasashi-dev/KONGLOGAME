@@ -740,6 +740,7 @@ function updateUI() {
         gameState.savingsAccount,
         "IDR"
     );
+    document.getElementById("floatingWalletValue").textContent = formatMoney(gameState.money);
     stockDividendsEl.textContent = formatMoney(gameState.stockDividends);
     businessIncomeEl.textContent = formatMoney(gameState.businessIncome);
     currentLevelEl.textContent = gameState.level;
