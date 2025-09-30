@@ -56,14 +56,14 @@ body {
 
 #floatingWallet {
     position: fixed;
-    top: 60px; /* pas di bawah navbar */
+    top: 70px; /* pas di bawah navbar */
     left: 20px;
     background: var(--bg-navbar);
     padding: 8px 14px;
     border-radius: 10px;
     color: #ffd700;
     font-weight: bold;
-    font-size: 1.6em;
+    font-size: 1.1em;
     z-index: 1200;
     display: flex;
     align-items: center;
