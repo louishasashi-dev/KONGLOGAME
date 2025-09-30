@@ -47,7 +47,25 @@ const assetData = {
         { name: "NVIDIA Corp.", price: 880, dividend: 0.002 },
         { name: "Bank Central Asia", price: 95, dividend: 0.006 },
         { name: "Telkom Indonesia", price: 45, dividend: 0.007 },
-        { name: "Garuda Indonesia", price: 120, dividend: 0.004 }
+        { name: "Garuda Indonesia", price: 120, dividend: 0.004 },
+ { name: "Gudang Garam Tbk", price: 123, dividend: 0.0045 },
+{ name: "Johnson & Johnson", price: 145, dividend: 0.0065 },
+{ name: "JPMorgan Chase & CO", price: 172, dividend: 0.004 },
+{ name: "Visa Inc", price: 245, dividend: 0.002 },
+{ name: "Master Card Inc", price: 312, dividend: 0.0035 },
+{ name: "Procter & Gamble", price: 108, dividend: 0.0055 },
+{ name: "The CocaCola Company", price: 58, dividend: 0.0075 },
+{ name: "Pepsi CO", price: 169, dividend: 0.0045 },
+{ name: "Walt Disney", price: 94, dividend: 0.0015 },
+{ name: "McDonald's Corp", price: 278, dividend: 0.005 },
+{ name: "Intel Corp", price: 42, dividend: 0.003 },
+{ name: "Samsung Electronics", price: 61, dividend: 0.004 },
+{ name: "Toyota Motors Corp", price: 139, dividend: 0.0055 },
+{ name: "Unilever PLC", price: 51, dividend: 0.006 },
+{ name: "Exxonmobil Corp", price: 119, dividend: 0.0075 },
+{ name: "Chevron Corp", price: 165, dividend: 0.008 },
+{ name: "Astra Internasional TBK", price: 3.2, dividend: 0.005 },
+{ name: "Bank Rakyat Indonesia TBK", price: 3.1, dividend: 0.0065 }
     ],
     vehicles: [
         {
