@@ -54,6 +54,31 @@ body {
     z-index: 1000;
 }
 
+#floatingWallet {
+    position: fixed;
+    top: 70px; /* pas di bawah navbar */
+    left: 20px;
+    background: var(--bg-navbar);
+    padding: 8px 14px;
+    border-radius: 10px;
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 1.6em;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+#floatingWallet.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .stats-btn {
     background: var(--btn-secondary);
     padding: 10px;
