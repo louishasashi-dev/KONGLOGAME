@@ -932,6 +932,25 @@ function confirmReset() {
   }
 }
 
+function checkFloatingWalletVisibility() {
+    const mainWallet = document.getElementById("mainWallet");
+    const floatingWallet = document.getElementById("floatingWallet");
+
+    if (!mainWallet || !floatingWallet) return;
+
+    const rect = mainWallet.getBoundingClientRect();
+    const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+    if (!isVisible) {
+        floatingWallet.classList.add("show");
+    } else {
+        floatingWallet.classList.remove("show");
+    }
+}
+
+// jalankan pas scroll
+window.addEventListener("scroll", checkFloatingWalletVisibility);
+
 // Initialize game
 loadGame();
 initAssetGrids();
