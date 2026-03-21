@@ -1,3 +1,5 @@
+// Mininglogic.js - Complete Game Logic with Number Shortening
+
 // DOM Elements
 const mainWalletEl = document.getElementById("mainWallet");
 const rupiahWalletEl = document.getElementById("rupiahWallet");
@@ -5,13 +7,45 @@ const stockDividendsEl = document.getElementById("stockDividends");
 const businessIncomeEl = document.getElementById("businessIncome");
 const currentLevelEl = document.getElementById("currentLevel");
 const incomeRateEl = document.getElementById("incomeRate");
+const floatingWalletValue = document.getElementById("floatingWalletValue");
 
 // Exchange rate
 const USD_TO_IDR = 16471;
 
+// Helper: Format numbers with K/M/B/T suffix (ONLY for 1,000+)
+function formatNumberShort(value) {
+    if (value === undefined || value === null) value = 0;
+    const absValue = Math.abs(value);
+    const sign = value < 0 ? '-' : '';
+    
+    // Only shorten if >= 1,000 (1K)
+    if (absValue >= 1e12) {
+        return sign + (absValue / 1e12).toFixed(2) + 'T';
+    }
+    if (absValue >= 1e9) {
+        return sign + (absValue / 1e9).toFixed(2) + 'B';
+    }
+    if (absValue >= 1e6) {
+        return sign + (absValue / 1e6).toFixed(2) + 'M';
+    }
+    if (absValue >= 1e3) {
+        return sign + (absValue / 1e3).toFixed(1) + 'K';
+    }
+    // Show full number for values < 1000
+    return sign + Math.floor(absValue).toLocaleString();
+}
+
+function formatMoney(amount, currency = "USD") {
+    if (currency === "USD") {
+        return "$" + formatNumberShort(amount);
+    } else {
+        return "Rp " + formatNumberShort(amount);
+    }
+}
+
 // Game state
 let gameState = {
-    money: 1000, // Start with some money
+    money: 1000,
     rupiahWallet: 0,
     savingsAccount: 0,
     stockDividends: 0,
@@ -34,7 +68,7 @@ let gameState = {
     }
 };
 
-// Asset definitions
+// FULL Asset definitions
 const assetData = {
     stocks: [
         { name: "Apple Inc.", price: 180, dividend: 0.005 },
@@ -48,466 +82,111 @@ const assetData = {
         { name: "Bank Central Asia", price: 95, dividend: 0.006 },
         { name: "Telkom Indonesia", price: 45, dividend: 0.007 },
         { name: "Garuda Indonesia", price: 120, dividend: 0.004 },
- { name: "Gudang Garam Tbk", price: 123, dividend: 0.0045 },
-{ name: "Johnson & Johnson", price: 145, dividend: 0.0065 },
-{ name: "JPMorgan Chase & CO", price: 172, dividend: 0.004 },
-{ name: "Visa Inc", price: 245, dividend: 0.002 },
-{ name: "Master Card Inc", price: 312, dividend: 0.0035 },
-{ name: "Procter & Gamble", price: 108, dividend: 0.0055 },
-{ name: "The CocaCola Company", price: 58, dividend: 0.0075 },
-{ name: "Pepsi CO", price: 169, dividend: 0.0045 },
-{ name: "Walt Disney", price: 94, dividend: 0.0015 },
-{ name: "McDonald's Corp", price: 278, dividend: 0.005 },
-{ name: "Intel Corp", price: 42, dividend: 0.003 },
-{ name: "Samsung Electronics", price: 61, dividend: 0.004 },
-{ name: "Toyota Motors Corp", price: 139, dividend: 0.0055 },
-{ name: "Unilever PLC", price: 51, dividend: 0.006 },
-{ name: "Exxonmobil Corp", price: 119, dividend: 0.0075 },
-{ name: "Chevron Corp", price: 165, dividend: 0.008 },
-{ name: "Astra Internasional TBK", price: 3.2, dividend: 0.005 },
-{ name: "Bank Rakyat Indonesia TBK", price: 3.1, dividend: 0.0065 }
+        { name: "Gudang Garam Tbk", price: 123, dividend: 0.0045 },
+        { name: "Johnson & Johnson", price: 145, dividend: 0.0065 },
+        { name: "JPMorgan Chase & CO", price: 172, dividend: 0.004 },
+        { name: "Visa Inc", price: 245, dividend: 0.002 },
+        { name: "Master Card Inc", price: 312, dividend: 0.0035 },
+        { name: "Procter & Gamble", price: 108, dividend: 0.0055 },
+        { name: "The CocaCola Company", price: 58, dividend: 0.0075 },
+        { name: "Pepsi CO", price: 169, dividend: 0.0045 },
+        { name: "Walt Disney", price: 94, dividend: 0.0015 },
+        { name: "McDonald's Corp", price: 278, dividend: 0.005 },
+        { name: "Intel Corp", price: 42, dividend: 0.003 },
+        { name: "Samsung Electronics", price: 61, dividend: 0.004 },
+        { name: "Toyota Motors Corp", price: 139, dividend: 0.0055 },
+        { name: "Unilever PLC", price: 51, dividend: 0.006 },
+        { name: "Exxonmobil Corp", price: 119, dividend: 0.0075 },
+        { name: "Chevron Corp", price: 165, dividend: 0.008 },
+        { name: "Astra Internasional TBK", price: 3.2, dividend: 0.005 },
+        { name: "Bank Rakyat Indonesia TBK", price: 3.1, dividend: 0.0065 }
     ],
     vehicles: [
-        {
-            name: "Lamborghini Aventador",
-            price: 500000,
-            image: "assets/images/vehicle/lamborghiniaventador.png"
-        },
-        {
-            name: "Ferrari 488 GTB",
-            price: 330000,
-            image: "assets/images/vehicle/Ferrari488GTB.png"
-        },
-        {
-            name: "McLaren 720S",
-            price: 310000,
-            image: "assets/images/vehicle/McLaren720S.png"
-        },
-        {
-            name: "Bugatti Chiron",
-            price: 3000000,
-            image: "assets/images/vehicle/bugattichiron.png"
-        },
-        {
-            name: "Rolls-Royce Phantom",
-            price: 460000,
-            image: "assets/images/vehicle/rollsroyce.png"
-        },
-        {
-            name: "Toyota Fortuner",
-            price: 12800,
-            image: "assets/images/vehicle/fortuner.png"
-        },
-        {
-            name: "Toyota Innova Reborn",
-            price: 11500,
-            image: "assets/images/vehicle/innova.png"
-        },
-        {
-            name: "Mitsubishi Xforce",
-            price: 9000,
-            image: "assets/images/vehicle/xforce.png"
-        },
-        {
-            name: "Mitsubishi Xpander",
-            price: 8200,
-            image: "assets/images/vehicle/expander.png"
-        },
-        {
-            name: "Toyota Yaris",
-            price: 12400,
-            image: "assets/images/vehicle/yaris.png"
-        },
-        {
-            name: "Mitsubishi L300",
-            price: 9000,
-            image: "assets/images/vehicle/l300.png"
-        }
+        { name: "Lamborghini Aventador", price: 500000, image: "assets/images/vehicle/lamborghiniaventador.png" },
+        { name: "Ferrari 488 GTB", price: 330000, image: "assets/images/vehicle/Ferrari488GTB.png" },
+        { name: "McLaren 720S", price: 310000, image: "assets/images/vehicle/McLaren720S.png" },
+        { name: "Bugatti Chiron", price: 3000000, image: "assets/images/vehicle/bugattichiron.png" },
+        { name: "Rolls-Royce Phantom", price: 460000, image: "assets/images/vehicle/rollsroyce.png" },
+        { name: "Toyota Fortuner", price: 12800, image: "assets/images/vehicle/fortuner.png" },
+        { name: "Toyota Innova Reborn", price: 11500, image: "assets/images/vehicle/innova.png" },
+        { name: "Mitsubishi Xforce", price: 9000, image: "assets/images/vehicle/xforce.png" },
+        { name: "Mitsubishi Xpander", price: 8200, image: "assets/images/vehicle/expander.png" },
+        { name: "Toyota Yaris", price: 12400, image: "assets/images/vehicle/yaris.png" },
+        { name: "Mitsubishi L300", price: 9000, image: "assets/images/vehicle/l300.png" }
     ],
     motorcycle: [
-        {
-            name: "kawasaki ninja h2r",
-            price: 46850,
-            image: "assets/images/motorcycle/ninjah2r.png"
-        },
-        {
-            name: "kawasaki ninja 400",
-            price: 9000,
-            image: "assets/images/motorcycle/ninja400.png"
-        },
-        {
-            name: "Honda Pcx 2025",
-            price: 2410,
-            image: "assets/images/motorcycle/pcx2025.png"
-        },
-        {
-            name: "Yamaha Nmax Turbo",
-            price: 2400,
-            image: "assets/images/motorcycle/nmaxturbo.png"
-        },
-        {
-            name: "Honda Vario 125 New",
-            price: 1900,
-            image: "assets/images/motorcycle/Proyek Baru 23 [5C6E267].png"
-        },
-        {
-            name: "Honda Beat Street 2025",
-            price: 1100,
-            image: "assets/images/motorcycle/beatstreet.png"
-        },
-        {
-            name: "Honda Beat sporty",
-            price: 1000,
-            image: "assets/images/motorcycle/Beatsporty.png"
-        },
-        {
-            name: "Yamaha Mio Sporty",
-            price: 230,
-            image: "assets/images/motorcycle/miosporty.png"
-        }
+        { name: "kawasaki ninja h2r", price: 46850, image: "assets/images/motorcycle/ninjah2r.png" },
+        { name: "kawasaki ninja 400", price: 9000, image: "assets/images/motorcycle/ninja400.png" },
+        { name: "Honda Pcx 2025", price: 2410, image: "assets/images/motorcycle/pcx2025.png" },
+        { name: "Yamaha Nmax Turbo", price: 2400, image: "assets/images/motorcycle/nmaxturbo.png" },
+        { name: "Honda Vario 125 New", price: 1900, image: "assets/images/motorcycle/Proyek Baru 23 [5C6E267].png" },
+        { name: "Honda Beat Street 2025", price: 1100, image: "assets/images/motorcycle/beatstreet.png" },
+        { name: "Honda Beat sporty", price: 1000, image: "assets/images/motorcycle/Beatsporty.png" },
+        { name: "Yamaha Mio Sporty", price: 230, image: "assets/images/motorcycle/miosporty.png" }
     ],
     realestate: [
-        {
-            name: "Luxury Penthouse NYC",
-            price: 5000000,
-            image: "assets/images/Real Estate/images (15).jpeg"
-        },
-        {
-            name: "Beverly Hills Mansion",
-            price: 8500000,
-            image: "assets/images/Real Estate/images (16).jpeg"
-        },
-        {
-            name: "Miami Beach Condo",
-            price: 2200000,
-            image: "assets/images/Real Estate/images (17).jpeg"
-        },
-        {
-            name: "London Townhouse",
-            price: 6700000,
-            image: "assets/images/Real Estate/images (18).jpeg"
-        },
-        {
-            name: "Tokyo Skyscraper Unit",
-            price: 3800000,
-            image: "assets/images/Real Estate/THE_TOKYO_TOWERS_JPN_0246.jpg"
-        },
-        {
-            name: "Dubai Marina Apartment",
-            price: 1900000,
-            image: "assets/images/Real Estate/images (19).jpeg"
-        },
-        {
-            name: "Singapore Sky Villa",
-            price: 4500000,
-            image: "assets/images/Real Estate/images (20).jpeg"
-        },
-        {
-            name: "Paris Luxury Loft",
-            price: 3200000,
-            image: "assets/images/Real Estate/images (21).jpeg"
-        },
-        {
-            name: "Swiss Alpine Chalet",
-            price: 2800000,
-            image: "assets/images/Real Estate/images (22).jpeg"
-        },
-        {
-            name: "Bali Beachfront Villa",
-            price: 1200000,
-            image: "assets/images/Real Estate/images (23).jpeg"
-        },
-        {
-            name: "Monaco Oceanview Suite",
-            price: 7200000,
-            image: "assets/images/Real Estate/images (24).jpeg"
-        }
+        { name: "Luxury Penthouse NYC", price: 5000000, image: "assets/images/Real Estate/images (15).jpeg" },
+        { name: "Beverly Hills Mansion", price: 8500000, image: "assets/images/Real Estate/images (16).jpeg" },
+        { name: "Miami Beach Condo", price: 2200000, image: "assets/images/Real Estate/images (17).jpeg" },
+        { name: "London Townhouse", price: 6700000, image: "assets/images/Real Estate/images (18).jpeg" },
+        { name: "Tokyo Skyscraper Unit", price: 3800000, image: "assets/images/Real Estate/THE_TOKYO_TOWERS_JPN_0246.jpg" },
+        { name: "Dubai Marina Apartment", price: 1900000, image: "assets/images/Real Estate/images (19).jpeg" },
+        { name: "Singapore Sky Villa", price: 4500000, image: "assets/images/Real Estate/images (20).jpeg" },
+        { name: "Paris Luxury Loft", price: 3200000, image: "assets/images/Real Estate/images (21).jpeg" },
+        { name: "Swiss Alpine Chalet", price: 2800000, image: "assets/images/Real Estate/images (22).jpeg" },
+        { name: "Bali Beachfront Villa", price: 1200000, image: "assets/images/Real Estate/images (23).jpeg" },
+        { name: "Monaco Oceanview Suite", price: 7200000, image: "assets/images/Real Estate/images (24).jpeg" }
     ],
     industry: [
-        {
-            name: "Tech Software Company",
-            price: 2000000,
-            income: 120000,
-            image: "assets/images/industry/TechSoftwareCompany.jpeg"
-        },
-        {
-            name: "Pharmaceutical Lab",
-            price: 5000000,
-            income: 280000,
-            image: "assets/images/industry/PharmaceuticalLab.jpeg"
-        },
-        {
-            name: "Renewable Energy Plant",
-            price: 8000000,
-            income: 420000,
-            image: "assets/images/industry/RenewableEnergyPlant.jpeg"
-        },
-        {
-            name: "Automotive Factory",
-            price: 12000000,
-            income: 650000,
-            image: "assets/images/industry/AutomotiveFactory.jpeg"
-        },
-        {
-            name: "Mining Operation",
-            price: 15000000,
-            income: 850000,
-            image: "assets/images/industry/MiningOperation.jpeg"
-        },
-        {
-            name: "Oil Refinery",
-            price: 25000000,
-            income: 1400000,
-            image: "assets/images/industry/OilRefinery.jpeg"
-        },
-        {
-            name: "Aerospace Manufacturing",
-            price: 35000000,
-            income: 2100000,
-            image: "assets/images/industry/AerospaceManufacturing.jpeg"
-        },
-        {
-            name: "AI Research Facility",
-            price: 50000000,
-            income: 3200000,
-            image: "assets/images/industry/AIResearchFacility.jpeg"
-        },
-        {
-            name: "Semiconductor Foundry",
-            price: 75000000,
-            income: 4800000,
-            image: "assets/images/industry/SemiconductorFoundry.jpeg"
-        },
-        {
-            name: "Space Technology Corp",
-            price: 100000000,
-            income: 6500000,
-            image: "assets/images/industry/SpaceTechnologyCorp.jpeg"
-        },
-        {
-            name: "Quantum Computing Lab",
-            price: 150000000,
-            income: 9800000,
-            image: "assets/images/industry/QuantumComputingLab.jpeg"
-        }
+        { name: "Tech Software Company", price: 2000000, income: 120000, image: "assets/images/industry/TechSoftwareCompany.jpeg" },
+        { name: "Pharmaceutical Lab", price: 5000000, income: 280000, image: "assets/images/industry/PharmaceuticalLab.jpeg" },
+        { name: "Renewable Energy Plant", price: 8000000, income: 420000, image: "assets/images/industry/RenewableEnergyPlant.jpeg" },
+        { name: "Automotive Factory", price: 12000000, income: 650000, image: "assets/images/industry/AutomotiveFactory.jpeg" },
+        { name: "Mining Operation", price: 15000000, income: 850000, image: "assets/images/industry/MiningOperation.jpeg" },
+        { name: "Oil Refinery", price: 25000000, income: 1400000, image: "assets/images/industry/OilRefinery.jpeg" },
+        { name: "Aerospace Manufacturing", price: 35000000, income: 2100000, image: "assets/images/industry/AerospaceManufacturing.jpeg" },
+        { name: "AI Research Facility", price: 50000000, income: 3200000, image: "assets/images/industry/AIResearchFacility.jpeg" },
+        { name: "Semiconductor Foundry", price: 75000000, income: 4800000, image: "assets/images/industry/SemiconductorFoundry.jpeg" },
+        { name: "Space Technology Corp", price: 100000000, income: 6500000, image: "assets/images/industry/SpaceTechnologyCorp.jpeg" },
+        { name: "Quantum Computing Lab", price: 150000000, income: 9800000, image: "assets/images/industry/QuantumComputingLab.jpeg" }
     ],
     business: [
-        {
-            name: "Angkringan",
-            price: 200,
-            income: 78,
-            image: "assets/images/business/angkringan.jpeg"
-        },
-        {
-            name: "warung madura",
-            price: 256,
-            income: 45,
-            image: "assets/images/business/warungmadura.jpeg"
-        },
-        {
-            name: "Pecel lele",
-            price: 495,
-            income: 185,
-            image: "assets/images/business/pecellele.jpeg"
-        },
-        {
-            name: "Rental PS",
-            price: 500,
-            income: 150,
-            image: "assets/images/business/rentalps.jpeg"
-        },
-        {
-            name: "Bengkel Motor",
-            price: 540,
-            income: 350,
-            image: "assets/images/business/bengkelmotor.jpeg"
-        },
-        {
-            name: "Sedot WC",
-            price: 560,
-            income: 210,
-            image: "assets/images/business/sedotwc.jpeg"
-        },
-        {
-            name: "Minimarket",
-            price: 650,
-            income: 334,
-            image: "assets/images/business/minimarket.jpeg"
-        },
-        {
-            name: "Bubur Ayam",
-            price: 600,
-            income: 300,
-            image: "assets/images/business/buburayam.jpeg"
-        },
-        {
-            name: "Warnet",
-            price: 460,
-            income: 156,
-            image: "assets/images/business/warnet.jpeg"
-        },
-        {
-            name: "Warung Kopi",
-            price: 750,
-            income: 400,
-            image: "assets/images/business/warkop.jpeg"
-        },
-        {
-            name: "Restoran Cepat saji",
-            price: 760,
-            income: 466,
-            image: "assets/images/business/restorancepatsaji.jpeg"
-        },
-        {
-            name: "Bakso Gerobak",
-            price: 800,
-            income: 420,
-            image: "assets/images/business/bakso.jpeg"
-        },
-        {
-            name: "Sate Madura",
-            price: 950,
-            income: 500,
-            image: "assets/images/business/sate.jpeg"
-        },
-        {
-            name: "Warteg",
-            price: 900,
-            income: 500,
-            image: "assets/images/business/warteg.jpeg"
-        },
-        {
-            name: "Warung Nasi Padang",
-            price: 1000,
-            income: 600,
-            image: "assets/images/business/naspad.jpeg"
-        },
-        {
-            name: "Es Teh Jumbo",
-            price: 400,
-            income: 150,
-            image: "assets/images/business/estehjumbo.jpeg"
-        },
-        {
-            name: "Warung Madura 24 Jam",
-            price: 1200,
-            income: 650,
-            image: "assets/images/business/warungmadura24.jpeg"
-        },
-        {
-            name: "Pecel Lele Lamongan",
-            price: 1100,
-            income: 580,
-            image: "assets/images/business/Lamongan.jpeg"
-        },
-        {
-            name: "Gorengan Pinggir Jalan",
-            price: 350,
-            income: 120,
-            image: "assets/images/business/gorengan.jpeg"
-        },
-        {
-            name: "Ayam Geprek",
-            price: 1400,
-            income: 750,
-            image: "assets/images/business/ayamgeprekawokawok.jpeg"
-        },
-        {
-            name: "Martabak Manis & Telur",
-            price: 1300,
-            income: 700,
-            image: "assets/images/business/martabak.jpeg"
-        },
-        {
-            name: "Toko Pulsa & Kuota",
-            price: 1250,
-            income: 600,
-            image: "assets/images/business/konterhp.jpeg"
-        },
-        {
-            name: "Ojek Pangkalan",
-            price: 1500,
-            income: 650,
-            image: "assets/images/business/opang.jpeg"
-        },
-        {
-            name: "Jasa Cuci Motor",
-            price: 1600,
-            income: 800,
-            image: "assets/images/business/jasacucimotor.jpeg"
-        },
-        {
-            name: "Fotokopian",
-            price: 1700,
-            income: 850,
-            image: "assets/images/business/fotocopy.jpeg"
-        },
-        {
-            name: "Rental PS & Warnet",
-            price: 1800,
-            income: 900,
-            image: "assets/images/business/warnet24ps.jpeg"
-        },
-        {
-            name: "Percetakan Undangan",
-            price: 2200,
-            income: 1100,
-            image: "assets/images/business/cetakundangan.jpeg"
-        },
-        {
-            name: "Jasa Sedot WC",
-            price: 2100,
-            income: 1050,
-            image: "assets/images/business/sedotwc25.jpeg"
-        },
-        {
-            name: "Konter HP & Service",
-            price: 2800,
-            income: 1400,
-            image: "assets/images/business/servicehp.jpeg"
-        },
-        {
-            name: "Toko Kelontong",
-            price: 2000,
-            income: 1000,
-            image: "assets/images/business/kelontong.jpeg"
-        },
-        {
-            name: "Pasar Tradisional Kios",
-            price: 5000,
-            income: 2500,
-            image: "assets/images/business/kioskois.jpeg"
-        },
-        {
-            name: "Penyedia Lapak",
-            price: 35000,
-            income: 3000,
-            image: "assets/images/business/penyedialapak.jpeg"
-        },
-        {
-            name: "Rental Mobil",
-            price: 24500,
-            income: 9870,
-            image: "assets/images/business/rentalmobil.jpeg"
-        },
-        {
-            name: "Bengkel Mobil",
-            price: 89000,
-            income: 8500,
-            image: "assets/images/business/bengkelmobil.jpeg"
-        },
-        {
-            name: "Koprasi Simpan Pinjam",
-            price: 100000,
-            income: 58700,
-            image: "assets/images/business/koprasi.jpeg"
-        },
-        {
-            name: "Toko Emas",
-            price: 150000,
-            income: 76000,
-            image: "assets/images/business/tokoemas.jpeg"
-        }
+        { name: "Angkringan", price: 200, income: 78, image: "assets/images/business/angkringan.jpeg" },
+        { name: "warung madura", price: 256, income: 45, image: "assets/images/business/warungmadura.jpeg" },
+        { name: "Pecel lele", price: 495, income: 185, image: "assets/images/business/pecellele.jpeg" },
+        { name: "Rental PS", price: 500, income: 150, image: "assets/images/business/rentalps.jpeg" },
+        { name: "Bengkel Motor", price: 540, income: 350, image: "assets/images/business/bengkelmotor.jpeg" },
+        { name: "Sedot WC", price: 560, income: 210, image: "assets/images/business/sedotwc.jpeg" },
+        { name: "Minimarket", price: 650, income: 334, image: "assets/images/business/minimarket.jpeg" },
+        { name: "Bubur Ayam", price: 600, income: 300, image: "assets/images/business/buburayam.jpeg" },
+        { name: "Warnet", price: 460, income: 156, image: "assets/images/business/warnet.jpeg" },
+        { name: "Warung Kopi", price: 750, income: 400, image: "assets/images/business/warkop.jpeg" },
+        { name: "Restoran Cepat saji", price: 760, income: 466, image: "assets/images/business/restorancepatsaji.jpeg" },
+        { name: "Bakso Gerobak", price: 800, income: 420, image: "assets/images/business/bakso.jpeg" },
+        { name: "Sate Madura", price: 950, income: 500, image: "assets/images/business/sate.jpeg" },
+        { name: "Warteg", price: 900, income: 500, image: "assets/images/business/warteg.jpeg" },
+        { name: "Warung Nasi Padang", price: 1000, income: 600, image: "assets/images/business/naspad.jpeg" },
+        { name: "Es Teh Jumbo", price: 400, income: 150, image: "assets/images/business/estehjumbo.jpeg" },
+        { name: "Warung Madura 24 Jam", price: 1200, income: 650, image: "assets/images/business/warungmadura24.jpeg" },
+        { name: "Pecel Lele Lamongan", price: 1100, income: 580, image: "assets/images/business/Lamongan.jpeg" },
+        { name: "Gorengan Pinggir Jalan", price: 350, income: 120, image: "assets/images/business/gorengan.jpeg" },
+        { name: "Ayam Geprek", price: 1400, income: 750, image: "assets/images/business/ayamgeprekawokawok.jpeg" },
+        { name: "Martabak Manis & Telur", price: 1300, income: 700, image: "assets/images/business/martabak.jpeg" },
+        { name: "Toko Pulsa & Kuota", price: 1250, income: 600, image: "assets/images/business/konterhp.jpeg" },
+        { name: "Ojek Pangkalan", price: 1500, income: 650, image: "assets/images/business/opang.jpeg" },
+        { name: "Jasa Cuci Motor", price: 1600, income: 800, image: "assets/images/business/jasacucimotor.jpeg" },
+        { name: "Fotokopian", price: 1700, income: 850, image: "assets/images/business/fotocopy.jpeg" },
+        { name: "Rental PS & Warnet", price: 1800, income: 900, image: "assets/images/business/warnet24ps.jpeg" },
+        { name: "Percetakan Undangan", price: 2200, income: 1100, image: "assets/images/business/cetakundangan.jpeg" },
+        { name: "Jasa Sedot WC", price: 2100, income: 1050, image: "assets/images/business/sedotwc25.jpeg" },
+        { name: "Konter HP & Service", price: 2800, income: 1400, image: "assets/images/business/servicehp.jpeg" },
+        { name: "Toko Kelontong", price: 2000, income: 1000, image: "assets/images/business/kelontong.jpeg" },
+        { name: "Pasar Tradisional Kios", price: 5000, income: 2500, image: "assets/images/business/kioskois.jpeg" },
+        { name: "Penyedia Lapak", price: 35000, income: 3000, image: "assets/images/business/penyedialapak.jpeg" },
+        { name: "Rental Mobil", price: 24500, income: 9870, image: "assets/images/business/rentalmobil.jpeg" },
+        { name: "Bengkel Mobil", price: 89000, income: 8500, image: "assets/images/business/bengkelmobil.jpeg" },
+        { name: "Koprasi Simpan Pinjam", price: 100000, income: 58700, image: "assets/images/business/koprasi.jpeg" },
+        { name: "Toko Emas", price: 150000, income: 76000, image: "assets/images/business/tokoemas.jpeg" }
     ]
 };
 
@@ -515,172 +194,95 @@ const assetData = {
 function initAssetGrids() {
     Object.keys(assetData).forEach(category => {
         const grid = document.getElementById(category + "Grid");
+        if (!grid) return;
+        grid.innerHTML = '';
         assetData[category].forEach((asset, index) => {
             const assetEl = document.createElement("div");
             assetEl.className = "asset-item";
-
-            let imageHtml = "";
-            if (asset.image) {
-                imageHtml = `<img src="${asset.image}" alt="${asset.name}" class="asset-image" onerror="this.style.display='none'">`;
-            }
-
-            // markup dasar
-            let baseHtml = `
+            let imageHtml = asset.image ? `<img src="${asset.image}" alt="${asset.name}" class="asset-image" onerror="this.style.display='none'">` : '';
+            let incomeText = getAssetIncomeText(category, asset);
+            
+            assetEl.innerHTML = `
                 ${imageHtml}
                 <div class="asset-name">${asset.name}</div>
-                <div class="asset-price">$${asset.price.toLocaleString()}</div>
-                <div class="asset-income">${getAssetIncomeText(
-                    category,
-                    asset
-                )}</div>
+                <div class="asset-price">$${formatNumberShort(asset.price)}</div>
+                <div class="asset-income">${incomeText}</div>
                 <div class="asset-owned">Owned: <span id="${category}_${index}_owned">0</span></div>
-                <button class="buy-btn" onclick="buyAsset('${category}', ${index})">Buy Asset</button>
-            `;
-
-            // 🔹 Tambahkan kontrol Buy Qty & All In ke SEMUA kategori
-            baseHtml += `
-                <div class="buy-controls" style="display:flex;gap:8px;margin-top:10px;align-items:center;">
-                    <input 
-                        type="number" 
-                        id="${category}_${index}_qty" 
-                        value="1" 
-                        min="1" 
-                        style="width:90px;padding:6px;border-radius:6px;border:none;"
-                    >
-                    <button 
-                        id="${category}_${index}_buyqty" 
-                        class="buy-btn" 
-                        onclick="buyAsset('${category}', ${index}, Math.max(1, parseInt(document.getElementById('${category}_${index}_qty').value)||1))">
-                        Buy Qty
-                    </button>
-                    <button 
-                        id="${category}_${index}_allin" 
-                        class="buy-btn" 
-                        onclick="buyAllIn('${category}', ${index})">
-                        All In
-                    </button>
+                <button class="buy-btn" onclick="buyAsset('${category}', ${index}, 1)">Buy 1</button>
+                <div class="buy-controls">
+                    <input type="number" id="${category}_${index}_qty" value="1" min="1" style="width:70px;padding:6px;border-radius:8px;">
+                    <button class="buy-btn" onclick="buyAsset('${category}', ${index}, parseInt(document.getElementById('${category}_${index}_qty').value)||1)">Buy Qty</button>
+                    <button class="buy-btn" onclick="buyAllIn('${category}', ${index})">All In</button>
                 </div>
             `;
-
-            assetEl.innerHTML = baseHtml;
             grid.appendChild(assetEl);
         });
     });
 }
 
 function getAssetIncomeText(category, asset) {
-    if (category === "stocks") {
-        return `Dividend: ${(asset.dividend * 100).toFixed(2)}%/sec`;
-    } else if (category === "industry" || category === "business") {
-        return `Income: $${asset.income.toLocaleString()}/sec`;
-    } else {
-        return `Passive: 3%/sec`;
-    }
+    if (category === "stocks") return `Dividend: ${(asset.dividend * 100).toFixed(2)}%/sec`;
+    if (category === "industry" || category === "business") return `Income: $${formatNumberShort(asset.income)}/sec`;
+    return `Passive: 3%/sec`;
 }
 
-function showTab(tabName) {
-    // Hide all tabs
-    document.querySelectorAll(".tab-content").forEach(tab => {
-        tab.classList.remove("active");
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabName = btn.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        btn.classList.add('active');
     });
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
-
-    // Show selected tab
-    document.getElementById(tabName).classList.add("active");
-    event.target.classList.add("active");
-}
+});
 
 function buyAsset(category, index, quantity = 1) {
     const asset = assetData[category][index];
     const totalPrice = asset.price * quantity;
-
     if (gameState.money >= totalPrice) {
         gameState.money -= totalPrice;
-
-        if (!gameState.assets[category][index]) {
-            gameState.assets[category][index] = 0;
-        }
+        if (!gameState.assets[category][index]) gameState.assets[category][index] = 0;
         gameState.assets[category][index] += quantity;
-
         updateUI();
         updateAssetDisplay(category, index);
     } else {
-        alert("Saldo tidak cukup untuk beli " + quantity + " " + asset.name);
+        alert(`Saldo tidak cukup untuk beli ${quantity} ${asset.name}`);
     }
-}
-
-function updateAssetDisplay(category, index) {
-    // Update teks "Owned"
-    const ownedEl = document.getElementById(`${category}_${index}_owned`);
-    if (ownedEl) {
-        const owned = gameState.assets[category][index] || 0;
-        ownedEl.textContent = owned;
-    }
-
-    // 🔹 Semua kategori: kelola tombol Buy Qty & All In
-    const asset = assetData[category][index];
-    const canAffordOne = gameState.money >= asset.price;
-
-    const qtyInput = document.getElementById(`${category}_${index}_qty`);
-    const buyQtyBtn = document.getElementById(`${category}_${index}_buyqty`);
-    const allInBtn  = document.getElementById(`${category}_${index}_allin`);
-
-    if (qtyInput && (parseInt(qtyInput.value) || 0) < 1) {
-        qtyInput.value = 1;
-    }
-    if (buyQtyBtn) buyQtyBtn.disabled = !canAffordOne;
-    if (allInBtn)  allInBtn.disabled  = !canAffordOne;
 }
 
 function buyAllIn(category, index) {
     const asset = assetData[category][index];
     const maxQty = Math.floor(gameState.money / asset.price);
+    if (maxQty > 0) buyAsset(category, index, maxQty);
+    else alert("Saldo tidak cukup untuk all-in");
+}
 
-    if (maxQty > 0) {
-        buyAsset(category, index, maxQty);
-    } else {
-        alert("Saldo tidak cukup untuk all-in di " + asset.name);
-    }
+function updateAssetDisplay(category, index) {
+    const ownedEl = document.getElementById(`${category}_${index}_owned`);
+    if (ownedEl) ownedEl.textContent = gameState.assets[category][index] || 0;
 }
 
 function calculatePassiveIncome() {
-    let totalPassive = 0;
-    let stockDividendIncome = 0;
-    let businessIncomeTotal = 0;
-
+    let totalPassive = 0, stockDividendIncome = 0, businessIncomeTotal = 0;
     Object.keys(gameState.assets).forEach(category => {
         Object.keys(gameState.assets[category]).forEach(index => {
             const owned = gameState.assets[category][index];
             const asset = assetData[category][index];
-
             if (owned > 0) {
-                if (category === "stocks") {
-                    stockDividendIncome += asset.price * asset.dividend * owned;
-                } else if (category === "industry" || category === "business") {
-                    businessIncomeTotal += asset.income * owned;
-                } else {
-                    totalPassive += asset.price * 0.03 * owned;
-                }
+                if (category === "stocks") stockDividendIncome += asset.price * asset.dividend * owned;
+                else if (category === "industry" || category === "business") businessIncomeTotal += asset.income * owned;
+                else totalPassive += asset.price * 0.03 * owned;
             }
         });
     });
-
-    return {
-        totalPassive,
-        stockDividendIncome,
-        businessIncomeTotal
-    };
+    return { totalPassive, stockDividendIncome, businessIncomeTotal };
 }
 
 function getCurrentIncome() {
-    const { totalPassive, stockDividendIncome, businessIncomeTotal } =
-        calculatePassiveIncome();
+    const { totalPassive, stockDividendIncome, businessIncomeTotal } = calculatePassiveIncome();
     const miningIncome = gameState.baseIncome + (gameState.level - 1);
-    return (
-        miningIncome + totalPassive + stockDividendIncome + businessIncomeTotal
-    );
+    return miningIncome + totalPassive + stockDividendIncome + businessIncomeTotal;
 }
 
 function convertToRupiah() {
@@ -690,7 +292,7 @@ function convertToRupiah() {
         gameState.rupiahWallet += usdAmount * USD_TO_IDR;
         document.getElementById("usdAmount").value = "";
         updateUI();
-    }
+    } else alert("USD tidak valid atau saldo tidak cukup");
 }
 
 function convertToUSD() {
@@ -700,133 +302,73 @@ function convertToUSD() {
         gameState.money += idrAmount / USD_TO_IDR;
         document.getElementById("idrAmount").value = "";
         updateUI();
-    }
+    } else alert("IDR tidak valid");
 }
 
 function transferSavingsToRupiah() {
-    const amount = parseFloat(
-        document.getElementById("savingsTransferAmount").value
-    );
-
+    const amount = parseFloat(document.getElementById("savingsTransferAmount").value);
     if (amount > 0 && gameState.savingsAccount >= amount) {
-        // Kurangi dari tabungan
         gameState.savingsAccount -= amount;
-
-        // Tambahkan ke rupiah wallet
         gameState.rupiahWallet += amount;
-
-        // Kosongin input biar rapih
         document.getElementById("savingsTransferAmount").value = "";
-
-        // Update UI biar keliatan langsung
         updateUI();
-    } else {
-        alert("Saldo tidak cukup atau jumlah tidak valid!");
-    }
-}
-
-function formatMoney(amount, currency = "USD") {
-    if (currency === "USD") {
-        return "$" + Math.floor(amount).toLocaleString();
-    } else {
-        return "Rp " + Math.floor(amount).toLocaleString();
-    }
+    } else alert("Saldo tabungan tidak cukup!");
 }
 
 function updateUI() {
     mainWalletEl.textContent = formatMoney(gameState.money);
+    floatingWalletValue.textContent = formatMoney(gameState.money);
     rupiahWalletEl.textContent = formatMoney(gameState.rupiahWallet, "IDR");
-    document.getElementById("savingsAccount").textContent = formatMoney(
-        gameState.savingsAccount,
-        "IDR"
-    );
-    document.getElementById("floatingWalletValue").textContent = formatMoney(gameState.money);
+    document.getElementById("savingsAccount").textContent = formatMoney(gameState.savingsAccount, "IDR");
     stockDividendsEl.textContent = formatMoney(gameState.stockDividends);
     businessIncomeEl.textContent = formatMoney(gameState.businessIncome);
     currentLevelEl.textContent = gameState.level;
     incomeRateEl.textContent = `+${formatMoney(getCurrentIncome())}/detik`;
-
-    // Update upgrade info
+    
     if (gameState.level < 10) {
         const nextLevel = gameState.level + 1;
         const upgradeCost = gameState.upgradeCosts[nextLevel - 1];
         document.getElementById("nextLevel").textContent = nextLevel;
-        document.getElementById("nextIncome").textContent =
-            gameState.baseIncome + (nextLevel - 1);
-        document.getElementById("upgradeCost").textContent =
-            upgradeCost.toLocaleString();
-
+        document.getElementById("nextIncome").textContent = gameState.baseIncome + (nextLevel - 1);
+        document.getElementById("upgradeCost").textContent = formatNumberShort(upgradeCost);
         const upgradeBtn = document.getElementById("upgradeBtn");
         if (gameState.money >= upgradeCost) {
             upgradeBtn.disabled = false;
             upgradeBtn.textContent = "Upgrade Level";
         } else {
             upgradeBtn.disabled = true;
-            upgradeBtn.textContent = `Need ${formatMoney(
-                upgradeCost - gameState.money
-            )} more`;
+            upgradeBtn.textContent = `Need ${formatMoney(upgradeCost - gameState.money)} more`;
         }
     }
-
-    // Update asset ownership displays
+    
     Object.keys(gameState.assets).forEach(category => {
-        Object.keys(gameState.assets[category]).forEach(index => {
-            updateAssetDisplay(category, parseInt(index));
-        });
-    });
-
-    // Update buy buttons - only check main wallet since all purchases are from main wallet
-    Object.keys(assetData).forEach(category => {
-        assetData[category].forEach((asset, index) => {
-            const buyBtn = document.querySelector(
-                `button[onclick="buyAsset('${category}', ${index})"]`
-            );
-            if (buyBtn) {
-                buyBtn.disabled = gameState.money < asset.price;
-            }
-        });
+        Object.keys(gameState.assets[category]).forEach(index => updateAssetDisplay(category, parseInt(index)));
     });
 }
 
-function toggleStats() {
-    const panel = document.getElementById("statsPanel");
-    panel.classList.toggle("active");
+// Stats Panel
+const statsPanel = document.getElementById("statsPanel");
+document.getElementById("statsToggleBtn").addEventListener("click", () => {
+    statsPanel.classList.toggle("active");
     updateStatsUI();
-    // Tutup stats panel kalau klik di luar
-    document.addEventListener("click", function (event) {
-        const panel = document.getElementById("statsPanel");
-        const menuBtn = document.querySelector(".stats-btn");
-
-        // Kalau panel lagi aktif dan klik bukan di panel atau tombol
-        if (
-            panel.classList.contains("active") &&
-            !panel.contains(event.target) &&
-            !menuBtn.contains(event.target)
-        ) {
-            panel.classList.remove("active");
-        }
-    });
-}
+});
+document.getElementById("closeStatsBtn").addEventListener("click", () => statsPanel.classList.remove("active"));
+document.addEventListener("click", (e) => {
+    if (statsPanel.classList.contains("active") && !statsPanel.contains(e.target) && !e.target.closest(".stats-btn")) {
+        statsPanel.classList.remove("active");
+    }
+});
 
 function updateStatsUI() {
-    document.getElementById("statsSavings").textContent = formatMoney(
-        gameState.stats.totalSavingsInterest,
-        "IDR"
-    );
-    document.getElementById("statsStock").textContent = formatMoney(
-        gameState.stats.totalStockIncome
-    );
-    document.getElementById("statsBusiness").textContent = formatMoney(
-        gameState.stats.totalBusinessIncome
-    );
+    document.getElementById("statsSavings").textContent = formatMoney(gameState.stats.totalSavingsInterest, "IDR");
+    document.getElementById("statsStock").textContent = formatMoney(gameState.stats.totalStockIncome);
+    document.getElementById("statsBusiness").textContent = formatMoney(gameState.stats.totalBusinessIncome);
 }
 
 function upgradeLevel() {
     if (gameState.level >= 10) return;
-
     const nextLevel = gameState.level + 1;
     const upgradeCost = gameState.upgradeCosts[nextLevel - 1];
-
     if (gameState.money >= upgradeCost) {
         gameState.money -= upgradeCost;
         gameState.level = nextLevel;
@@ -835,124 +377,67 @@ function upgradeLevel() {
 }
 
 function gameTick() {
-    const { totalPassive, stockDividendIncome, businessIncomeTotal } =
-        calculatePassiveIncome();
+    const { totalPassive, stockDividendIncome, businessIncomeTotal } = calculatePassiveIncome();
     const miningIncome = gameState.baseIncome + (gameState.level - 1);
-
-    // Add to respective wallets
     gameState.money += miningIncome + totalPassive;
     gameState.stockDividends += stockDividendIncome;
     gameState.businessIncome += businessIncomeTotal;
-
     gameState.stats.totalStockIncome += stockDividendIncome;
     gameState.stats.totalBusinessIncome += businessIncomeTotal;
-
-    // ✅ Bunga tabungan
+    
     if (gameState.savingsAccount > 0) {
         const interest = gameState.savingsAccount * 0.001;
         gameState.savingsAccount += interest;
         gameState.stats.totalSavingsInterest += interest;
     }
-
     updateUI();
 }
 
 function autoTransferToMain() {
-    // Transfer Stock Dividends
-    if (gameState.stockDividends > 0) {
-        gameState.money += gameState.stockDividends;
-        gameState.stockDividends = 0;
-    }
-
-    // Transfer Business Income
-    if (gameState.businessIncome > 0) {
-        gameState.money += gameState.businessIncome;
-        gameState.businessIncome = 0;
-    }
-
+    if (gameState.stockDividends > 0) { gameState.money += gameState.stockDividends; gameState.stockDividends = 0; }
+    if (gameState.businessIncome > 0) { gameState.money += gameState.businessIncome; gameState.businessIncome = 0; }
     updateUI();
     updateStatsUI();
 }
 
 function autoSaveToSavings() {
     if (gameState.rupiahWallet > 0) {
-        // Ambil 65% dari saldo rupiah wallet
         const amountToSave = gameState.rupiahWallet * 0.65;
-
-        // Kurangi dari rupiah wallet
         gameState.rupiahWallet -= amountToSave;
-
-        // Tambahin ke rekening
         gameState.savingsAccount += amountToSave;
-
         updateUI();
-        console.log(
-            "Auto Savings: Rp",
-            Math.floor(amountToSave).toLocaleString()
-        );
     }
 }
 
-function saveGame() {
-    localStorage.setItem("investmentEmpireSave", JSON.stringify(gameState));
-}
-
+function saveGame() { localStorage.setItem("investmentEmpireSave", JSON.stringify(gameState)); }
 function loadGame() {
     const savedData = localStorage.getItem("investmentEmpireSave");
-    if (savedData) {
-        gameState = {
-            ...gameState,
-            ...JSON.parse(savedData)
-        };
-    }
+    if (savedData) { gameState = { ...gameState, ...JSON.parse(savedData) }; }
 }
 
-function openResetModal() {
-  const m = document.getElementById("resetModal");
-  if (m) m.classList.add("show");
-}
-
-function closeResetModal() {
-  const m = document.getElementById("resetModal");
-  if (m) m.classList.remove("show");
-}
-
-function confirmReset() {
-  try {
-    // Hapus save
+// Reset Modal
+const resetModal = document.getElementById("resetModal");
+document.getElementById("resetModalBtn").addEventListener("click", () => resetModal.classList.add("show"));
+document.getElementById("cancelResetBtn").addEventListener("click", () => resetModal.classList.remove("show"));
+document.getElementById("confirmResetBtn").addEventListener("click", () => {
     localStorage.removeItem("investmentEmpireSave");
-
-    // (Opsional) getaran mini di device yang support
     if (navigator.vibrate) navigator.vibrate(60);
-
-    // Muat ulang biar semua state balik ke default (lihat default gameState di file ini)
     window.location.reload();
-  } catch (e) {
-    alert("Gagal reset: " + e.message);
-    closeResetModal();
-  }
-}
+});
 
 function checkFloatingWalletVisibility() {
     const mainWallet = document.getElementById("mainWallet");
-    const floatingWallet = document.getElementById("floatingWallet");
-
-    if (!mainWallet || !floatingWallet) return;
-
+    const floating = document.getElementById("floatingWallet");
+    if (!mainWallet || !floating) return;
     const rect = mainWallet.getBoundingClientRect();
     const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-
-    if (!isVisible) {
-        floatingWallet.classList.add("show");
-    } else {
-        floatingWallet.classList.remove("show");
-    }
+    floating.classList.toggle("show", !isVisible);
 }
 
-// jalankan pas scroll
 window.addEventListener("scroll", checkFloatingWalletVisibility);
+window.addEventListener("resize", checkFloatingWalletVisibility);
 
-// Initialize game
+// Initialize
 loadGame();
 initAssetGrids();
 updateUI();
@@ -960,3 +445,4 @@ setInterval(gameTick, 1000);
 setInterval(saveGame, 5000);
 setInterval(autoTransferToMain, 30000);
 setInterval(autoSaveToSavings, 100000);
+setTimeout(checkFloatingWalletVisibility, 100);
