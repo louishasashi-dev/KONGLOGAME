@@ -496,6 +496,24 @@ body {
   color: white;
 }
 
+.converter-buttons-group {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+}
+
+.converter-buttons-group .converter-btn {
+    flex: 1;
+}
+
+.allin-btn {
+    background: var(--accent-purple) !important;
+}
+
+.allin-btn:hover {
+    background: #7c3aed !important;
+}
+
 .converter-btn:hover {
   background: #2563eb;
   transform: translateY(-1px);
@@ -1030,6 +1048,14 @@ body {
     padding: 10px;
     font-size: 0.85rem;
   }
+
+  .converter-buttons-group {
+        flex-direction: row;
+    }
+    
+    .converter-buttons-group .converter-btn {
+        padding: 10px;
+    }
 }
 
 /* Untuk layar sangat kecil (iPhone SE, dll) */
