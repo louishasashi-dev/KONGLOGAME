@@ -12,27 +12,35 @@ const floatingWalletValue = document.getElementById("floatingWalletValue");
 // Exchange rate
 const USD_TO_IDR = 16471;
 
-// Helper: Format numbers with K/M/B/T suffix (ONLY for 1,000+)
+// Alternative: Consistent 2 decimal places for all shortened values
 function formatNumberShort(value) {
     if (value === undefined || value === null) value = 0;
     const absValue = Math.abs(value);
     const sign = value < 0 ? '-' : '';
     
-    // Only shorten if >= 1,000 (1K)
-    if (absValue >= 1e12) {
-        return sign + (absValue / 1e12).toFixed(2) + 'T';
+    const suffixes = [
+        '', 'K', 'M', 'B', 'T', 'AA', 'AB', 'AC', 'AD', 'AE', 
+        'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 
+        'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 
+        'AX', 'AY', 'AZ', 'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 
+        'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 
+        'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 
+        'BY', 'BZ'
+    ];
+    
+    let suffixIndex = 0;
+    let dividedValue = absValue;
+    
+    while (dividedValue >= 1000 && suffixIndex < suffixes.length - 1) {
+        dividedValue /= 1000;
+        suffixIndex++;
     }
-    if (absValue >= 1e9) {
-        return sign + (absValue / 1e9).toFixed(2) + 'B';
+    
+    if (suffixIndex === 0) {
+        return sign + Math.floor(dividedValue).toLocaleString();
     }
-    if (absValue >= 1e6) {
-        return sign + (absValue / 1e6).toFixed(2) + 'M';
-    }
-    if (absValue >= 1e3) {
-        return sign + (absValue / 1e3).toFixed(1) + 'K';
-    }
-    // Show full number for values < 1000
-    return sign + Math.floor(absValue).toLocaleString();
+    
+    return sign + dividedValue.toFixed(2) + suffixes[suffixIndex];
 }
 
 function formatMoney(amount, currency = "USD") {
