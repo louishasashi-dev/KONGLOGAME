@@ -127,6 +127,7 @@ const assetData = {
         { name: "kawasaki ninja 400", price: 9000, image: "assets/images/motorcycle/ninja400.png" },
         { name: "Honda Pcx 2025", price: 2410, image: "assets/images/motorcycle/pcx2025.png" },
         { name: "Yamaha Nmax Turbo", price: 2400, image: "assets/images/motorcycle/nmaxturbo.png" },
+        { name: "Honda Vario 160 modifed", price: 2100, image: "assets/images/motorcycle/vario160.png" },
         { name: "Honda Vario 125 New", price: 1900, image: "assets/images/motorcycle/Proyek Baru 23 [5C6E267].png" },
         { name: "Honda Beat Street 2025", price: 1100, image: "assets/images/motorcycle/beatstreet.png" },
         { name: "Honda Beat sporty", price: 1000, image: "assets/images/motorcycle/Beatsporty.png" },
