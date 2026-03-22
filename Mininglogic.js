@@ -147,6 +147,7 @@ const assetData = {
         { name: "Monaco Oceanview Suite", price: 7200000, image: "assets/images/Real Estate/images (24).jpeg" }
     ],
     industry: [
+        { name: "Oil Palm Plantation", price: 1500000, income: 90000, image: "assets/images/industry/nyawit.jpg" },
         { name: "Tech Software Company", price: 2000000, income: 120000, image: "assets/images/industry/TechSoftwareCompany.jpeg" },
         { name: "Pharmaceutical Lab", price: 5000000, income: 280000, image: "assets/images/industry/PharmaceuticalLab.jpeg" },
         { name: "Renewable Energy Plant", price: 8000000, income: 420000, image: "assets/images/industry/RenewableEnergyPlant.jpeg" },
