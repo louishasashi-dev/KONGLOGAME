@@ -1,3 +1,6 @@
+# KONGLOGAME
+Konglogame is a web-based game, which has a business, investment and assets theme.
+
 Play Here!⬇️⬇️⬇️
 https://louishasashi-dev.github.io/KONGLOGAME/
 
@@ -12,17 +15,3 @@ display/preview⬇️⬇️⬇️
 <img width="710" height="834" alt="image" src="https://github.com/user-attachments/assets/480282c1-32b5-4d07-833e-3ec6f1c7be49" />
 <img width="701" height="839" alt="image" src="https://github.com/user-attachments/assets/2f3bbe68-7fdc-4987-a4d3-915fd569ac4b" />
 <img width="1915" height="885" alt="image" src="https://github.com/user-attachments/assets/1df87f47-e02b-4826-b6de-f9d76dfc42dc" />
-
-
-
-
-
-
-
-
-
-
-
-
-# KONGLOGAME
-Konglogame is a web-based game, which has a business, investment and assets theme.
