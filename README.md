@@ -1,7 +1,7 @@
 # KONGLOGAME
 Konglogame is a web-based game, which has a business, investment and assets theme.
 
-Play Here!⬇️⬇️⬇️
+Play Here!➡️➡️➡️
 https://louishasashi-dev.github.io/KONGLOGAME/
 
 display/preview⬇️⬇️⬇️
